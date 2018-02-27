@@ -1,6 +1,6 @@
 ---
 - block:
-  - name: Login to oVirt engine:
+  - name: Login to oVirt engine
     ovirt_auth:
       username: "{{ engine_user | default(omit) }}"
       password: "{{ engine_password | default(omit) }}"
