@@ -51,5 +51,9 @@ async_wait: 3600
 async_poll: 0
 async_retries: 100
 
+# setup retry variables
+wait_for_ip_retries: 20
+wait_for_ip_delay: 10
+
 # enable extra debugging
 verbose: false

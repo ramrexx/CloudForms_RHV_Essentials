@@ -38,26 +38,28 @@
       retries: "{{ async_retries }}"
       with_items: "{{ rhv_created_vms_async.results }}"
 
+    - name: Log rhv_created_vms
+      debug:
+        var: "{{ item.id }}"
+      with_items: "{{ rhv_created_vms.results }}"
+      when: verbose
+
     - name: Wait for VM IP
       ovirt_vms_facts:
         auth: "{{ ovirt_auth }}"
         pattern: "id={{ item.id }}"
         fetch_nested: true
         nested_attributes: ips
-      until: ovirt_vms | map(attribute='reported_devices') | list | first | length > 0
+      until: ovirt_vms | first | json_query('reported_devices[*].ips[*].address') | ipv4
+      # until: ovirt_vms | map(attribute='reported_devices') | list | first | length > 0
       with_items: "{{ rhv_created_vms.results }}"
-      retries: 10
-      delay: 10
+      retries: "{{ wait_for_ip_retries }}"
+      delay: "{{ wait_for_ip_delay }}"
+      when: wait_for_ip_address
 
-    - name: Log rhv_created_vms
+    - name: Log item.vm.reported_devices[0].ips[0]
       debug:
-        var: "{{ item }}"
-      with_items: "{{ rhv_created_vms.results }}"
-      when: verbose
-
-    - name: Log item.instance.ipv4
-      debug:
-        var: item.instance.ipv4
+        var: item.vm.reported_devices[0].ips[0]
       with_items: "{{ rhv_created_vms.results }}"
       when: wait_for_ip_address and verbose
 
