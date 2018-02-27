@@ -1,6 +1,6 @@
 ---
-- name: Login to oVirt engine
-  block:
+- block:
+  - name: Login to oVirt engine:
     ovirt_auth:
       username: "{{ engine_user | default(omit) }}"
       password: "{{ engine_password | default(omit) }}"
@@ -8,8 +8,8 @@
       ca_file: "{{ engine_cafile | default(omit) }}"
       insecure: "{{ engine_cafile is undefined }}"
 
-    - name: Provision instances asynchronously
-      block:
+    - block:
+      - name: Provision instances asynchronously
         ovirt_vms:
           auth: "{{ ovirt_auth }}"
           state: running
