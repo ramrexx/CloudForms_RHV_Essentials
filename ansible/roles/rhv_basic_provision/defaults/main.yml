@@ -1,58 +1,41 @@
 ---
-# For a full list of vmware_guest parameters, visit:
-# http://docs.ansible.com/ansible/latest/vmware_guest_module.html
+# For a full list of ovirt_vms parameters, visit:
+# http://docs.ansible.com/ansible/latest/ovirt_vms_module.html
 
-# vcenter parameters
-hostname: "{{ lookup('env', 'VMWARE_HOST') }}"
-username: "{{ lookup('env', 'VMWARE_USER') }}"
-password: "{{ lookup('env', 'VMWARE_PASSWORD') }}"
-validate_certs: false
+# RHV Auth parameters
+engine_url: "{{ lookup('env', 'OVIRT_URL') }}"
+engine_user: "{{ lookup('env', 'OVIRT_USERNAME') }}"
+engine_password: "{{ lookup('env', 'OVIRT_PASSWORD') }}"
+engine_cafile: "{{ lookup('env', 'OVIRT_CAFILE') }}"
+
 template:
 datacenter:
 cluster:
-folder: "/vm/Discovered virtual machine"
 
 # vm guest parameters
 vm_names:
-memory_mb: 1024
-num_cpus: 1
-notes: Provisioned via Ansible
+memory: 1GiB
+cpu_cores: 1
+cpu_sockets: 1
+operating_system:
+type: server
+description:
+comment: Provisioned via Ansible
 state: poweredon
 wait_for_ip_address: true
+remove_vms_on_error: true
 
 ## vm networking parameters
-vm_networks:
-  - name: "{{ network_0_vlan | default('VM Network') }}"
-    ### ip assignment (dhcp or static)
-    type: "{{ network_0_type | default('dhcp') }}"
-    ### device_type - (e1000, e1000e, pcnet32, vmxnet2, vmxnet3)
-    device_type: "{{ network_0_device_type | default('vmxnet3') }}"
-
-    ### static network parameters
-    # ip: "{{ network_0_ip | default(omit, true) }}"
-    # netmask: "{{ network_0_netmask | default(omit, true) }}"
-    # gateway: "{{ network_0_gateway | default(omit, true) }}"
-    # mac: "{{ network_0_mac | default(omit, true) }}"
-    # domain: "{{ network_0_dnsdomain | default(omit, true) }}"
-    # dns_servers:
-    #   - "{{ network_0_dns_0_server | default(omit, true) }}"
-    #   - "{{ network_0_dns_1_server | default(omit, true) }}"
+nics:
+  - name: "{{ network_0_name | default('nic1') }}"
+    profile_name: "{{ network_0_vlan | default('ovirtmgmt') }}"
+    ### interface - (virtio, e1000, rtl8139)
+    # interface: "{{ network_0_interface | default('virtio') }}"
 
 ## vm disk parameters
 # disks:
-#   - size_gb: "{{ vm_disk_0_size_gb }}"
-#     type: "{{ vm_disk_0_type | default('thin') }}"
-#     datastore: "{{ vm_disk_0_datastore }}"
-#   - size_gb: "{{ vm_disk_1_size_gb }}"
-#     type: "{{ vm_disk_1_type | default('thin') }}"
-#     datastore: "{{ vm_disk_1datastore }}"
-
-## vm customization parameters
-# customizations:
-
-## vm linked clone parameter
-snapshot_src:
-linked_clone: false
+#   - name: "{{ disk_0_name | default('disk1') }}"
+#     bootable: "{{ disk_0_bootable | default(true) }}"
 
 # asynchronous parameters
 async_wait: 3600

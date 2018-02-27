@@ -1,47 +1,84 @@
 ---
-- name: Provision instances asynchronously
-  vmware_guest:
-    hostname: "{{ hostname }}"
-    username: "{{ username }}"
-    password: "{{ password }}"
-    validate_certs: "{{ validate_certs }}"
-    name: "{{ item }}"
-    template: "{{ template }}"
-    datacenter: "{{ datacenter }}"
-    cluster: "{{ cluster }}"
-    folder: "{{ folder }}"
-    snapshot_src: "{{ snapshot_src | default(omit, true) }}"
-    linked_clone: "{{ linked_clone | default(omit, true) }}"
-    notes: "{{ notes | default(omit, true) }}"
-    hardware:
-      memory_mb: "{{ memory_mb }}"
-      num_cpus: "{{ num_cpus }}"
-    wait_for_ip_address: "{{ wait_for_ip_address }}"
-    networks: "{{ vm_networks }}"
-    disk: "{{ disks | default(omit, true) }}"
-    state: "{{ state }}"
-  delegate_to: localhost
-  with_items: "{{ vm_names }}"
-  register: rhv_created_vms_async
-  async: "{{ async_wait }}"
-  poll: "{{ async_poll }}"
+- name: Login to oVirt engine
+  block:
+    ovirt_auth:
+      username: "{{ engine_user | default(omit) }}"
+      password: "{{ engine_password | default(omit) }}"
+      url: "{{ engine_url | default(omit) }}"
+      ca_file: "{{ engine_cafile | default(omit) }}"
+      insecure: "{{ engine_cafile is undefined }}"
 
-- name: Wait for asynchronous job to complete
-  async_status: jid={{ item.ansible_job_id }}
-  register: rhv_created_vms
-  until: rhv_created_vms.finished
-  retries: "{{ async_retries }}"
-  with_items: "{{ rhv_created_vms_async.results }}"
+    - name: Provision instances asynchronously
+      block:
+      ovirt_vms:
+        auth: "{{ ovirt_auth }}"
+        state: running
+        name: "{{ item }}"
+        cluster: "{{ cluster }}"
+        template: "{{ template }}"
+        memory: "{{ memory_mb | default(omit) }}"
+        cpu_cores: "{{ cpu_cores | default(omit) }}"
+        cpu_sockets: "{{ cpu_sockets | default(omit) }}"
+        operating_system: "{{ operating_system | default(omit) }}"
+        comment: "{{ comment | default(omit) }}"
+        description: "{{ description | default(omit) }}"
+        type: "{{ type | default('server') }}"
+        disks: "{{ disks | default(omit) }}"
+        cloud_init: "{{ cloud_init | default(omit) }}"
+        nics: "{{ networks | default(omit) }}"
+      with_items: "{{ vm_names }}"
+      register: rhv_created_vms_async
+      async: "{{ async_wait }}"
+      poll: "{{ async_poll }}"
 
-- name: Log item.instance.ipv4
-  debug:
-    var: item.instance.ipv4
-  with_items: "{{ rhv_created_vms.results }}"
-  when: wait_for_ip_address and verbose
+    - name: Wait for asynchronous job to complete
+      async_status: jid={{ item.ansible_job_id }}
+      register: rhv_created_vms
+      until: rhv_created_vms.finished
+      retries: "{{ async_retries }}"
+      with_items: "{{ rhv_created_vms_async.results }}"
 
-- name: "Add new vm ip addresses to vmware_hosts group"
-  add_host:
-    name: "{{ item.instance.ipv4 }}"
-    groups: rhv_hosts
-  with_items: "{{ rhv_created_vms.results }}"
-  when: wait_for_ip_address
+    - name: Wait for VM IP
+      ovirt_vms_facts:
+        auth: "{{ ovirt_auth }}"
+        pattern: "id={{ item.id }}"
+        fetch_nested: true
+        nested_attributes: ips
+      until: ovirt_vms | map(attribute='reported_devices') | list | first | length > 0
+      with_items: "{{ rhv_created_vms.results }}"
+      retries: 10
+      delay: 10
+
+    - name: Log rhv_created_vms
+      debug:
+        var: "{{ item }}"
+      with_items: "{{ rhv_created_vms.results }}"
+      when: verbose
+
+    - name: Log item.instance.ipv4
+      debug:
+        var: item.instance.ipv4
+      with_items: "{{ rhv_created_vms.results }}"
+      when: wait_for_ip_address and verbose
+
+    - name: "Add new vm ip addresses to rhv_hosts group"
+      add_host:
+        name: "{{ item.instance.ipv4 }}"
+        groups: rhv_hosts
+      with_items: "{{ rhv_created_vms.results }}"
+      when: wait_for_ip_address
+
+  rescue:
+    - name: Remove VM if deploy fails
+      ovirt_vms:
+        auth: "{{ ovirt_auth }}"
+        name: "{{ item }}"
+        state: absent
+      with_items: "{{ vm_names }}"
+      when: remove_vms_on_error
+
+  always:
+    - name: Logout from oVirt engine
+      ovirt_auth:
+        state: absent
+        ovirt_auth: "{{ ovirt_auth }}"
