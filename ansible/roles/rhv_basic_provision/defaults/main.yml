@@ -3,13 +3,22 @@
 # http://docs.ansible.com/ansible/latest/ovirt_vms_module.html
 
 # RHV Auth parameters
+# engine_url: "{{ lookup('env', 'OVIRT_URL') }}"
+# engine_user: "{{ lookup('env', 'OVIRT_USERNAME') }}"
+# engine_password: "{{ lookup('env', 'OVIRT_PASSWORD') }}"
+# engine_cafile: "{{ lookup('env', 'OVIRT_CAFILE') }}"
+
 engine_url: "{{ lookup('env', 'OVIRT_URL') }}"
 engine_user: "{{ lookup('env', 'OVIRT_USERNAME') }}"
-engine_password: "{{ lookup('env', 'OVIRT_PASSWORD') }}"
-engine_cafile: "{{ lookup('env', 'OVIRT_CAFILE') }}"
+engine_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          64346561363331306139653037363834323831623934353165356363393737396364616464343030
+          3833383338636666393534353936653234333561386433660a393437373730623264333938633833
+          38303830653665613035616263313936383935313566636530663363646566313432653731353334
+          3338643532373231610a323063626438323832346237343937313763626433653237633633316434
+          6435
 
 template:
-datacenter:
 cluster:
 
 # vm guest parameters
