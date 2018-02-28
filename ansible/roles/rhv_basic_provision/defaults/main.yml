@@ -46,6 +46,7 @@ nics:
 #   - name: "{{ disk_0_name | default('disk1') }}"
 #     bootable: "{{ disk_0_bootable | default(true) }}"
 
+
 # asynchronous parameters
 async_wait: 3600
 async_poll: 0
