@@ -55,12 +55,13 @@
       with_items: "{{ rhv_created_vms.results }}"
       retries: "{{ wait_for_ip_retries }}"
       delay: "{{ wait_for_ip_delay }}"
+      register: wait_for_ip_output
       when: wait_for_ip_address
 
-    - name: Log item.vm.reported_devices[0].ips[0]
+    - name: Log item.vm
       debug:
-        var: item.vm.reported_devices[0].ips[0]
-      with_items: "{{ rhv_created_vms.results }}"
+        var: item.vm
+      with_items: "{{ wait_for_ip_output }}"
       when: wait_for_ip_address and verbose
 
     - name: "Add new vm ip addresses to rhv_hosts group"
