@@ -8,7 +8,7 @@
       when: manageiq is defined
 
     - role: rhv_vmname
-      when: generate_names is defined and generate_names
+      when: vm_prefix is defined
 
     - role: rhv_basic_provision
 
