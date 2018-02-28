@@ -60,8 +60,7 @@
 
     - name: Log item.vm
       debug:
-        var: "{{ item }}"
-      with_items: "{{ wait_for_ip_output }}"
+        var: "{{ wait_for_ip_output }}"
       when: wait_for_ip_address and verbose
 
     - name: "Add new vm ip addresses to rhv_hosts group"
