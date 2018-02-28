@@ -41,7 +41,7 @@
     - name: Log rhv_created_vms
       debug:
         var: "{{ item }}"
-      with_items: "{{ rhv_created_vms.results }}"
+      with_items: "{{ rhv_created_vms }}"
       when: verbose
 
     - name: Wait for VM IP
