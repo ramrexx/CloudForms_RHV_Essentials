@@ -60,7 +60,7 @@
 
     - name: Log item.vm
       debug:
-        var: item.vm
+        var: "{{ item }}"
       with_items: "{{ wait_for_ip_output }}"
       when: wait_for_ip_address and verbose
 
