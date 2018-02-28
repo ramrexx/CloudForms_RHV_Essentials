@@ -49,8 +49,7 @@
         pattern: "id={{ item.id }}"
         fetch_nested: true
         nested_attributes: ips
-      until: ovirt_vms | first | json_query('reported_devices[*].ips[*].address') | ipv4
-      # until: ovirt_vms | map(attribute='reported_devices') | list | first | length > 0
+      until: ovirt_vms | first | json_query('reported_devices[0].ips[0].address') | ipv4
       with_items: "{{ rhv_created_vms.results }}"
       retries: "{{ wait_for_ip_retries }}"
       delay: "{{ wait_for_ip_delay }}"
@@ -60,7 +59,6 @@
     - name: Log wait_for_ip_output
       debug:
         msg: "{{ item.ansible_facts.ovirt_vms[0]|json_query('reported_devices[0].ips[0].address')|ipv4 }}"
-      # var: item.ansible_facts.ovirt_vms[0]
       with_items: "{{ wait_for_ip_output.results }}"
       when: wait_for_ip_address and verbose
 
