@@ -60,7 +60,8 @@
 
     - name: Log wait_for_ip_output
       debug:
-        var: wait_for_ip_output
+        var: item.ansible_facts.ovirt_vms[0]
+      with_items: "{{ wait_for_ip_output.results }}"
       when: wait_for_ip_address and verbose
 
     - name: "Add new vm ip addresses to rhv_hosts group"
