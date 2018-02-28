@@ -40,7 +40,7 @@
 
     - name: Log rhv_created_vms
       debug:
-        var: "{{ item.id }}"
+        var: "{{ item }}"
       with_items: "{{ rhv_created_vms.results }}"
       when: verbose
 
