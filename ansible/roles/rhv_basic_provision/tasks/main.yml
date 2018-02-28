@@ -25,6 +25,8 @@
         type: "{{ type | default('server') }}"
         disks: "{{ disks | default(omit) }}"
         cloud_init:
+          custom_script: "touch /etc/cloud/cloud-init.disabled"
+          dns_search: mbu.labs.redhat.com
           host_name: "{{ item }}"
         nics: "{{ networks | default(omit) }}"
       with_items: "{{ vm_names }}"
