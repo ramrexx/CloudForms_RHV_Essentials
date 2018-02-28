@@ -41,7 +41,6 @@
     - name: Log rhv_created_vms
       debug:
         var: rhv_created_vms
-      # with_items: "{{ rhv_created_vms }}"
       when: verbose
 
     - name: Wait for VM IP
@@ -60,15 +59,16 @@
 
     - name: Log wait_for_ip_output
       debug:
-        var: item.ansible_facts.ovirt_vms[0]
+      var: item.ansible_facts.ovirt_vms|first|json_query('reported_devices[*].ips[*].address')|ipv4
+      # var: item.ansible_facts.ovirt_vms[0]
       with_items: "{{ wait_for_ip_output.results }}"
       when: wait_for_ip_address and verbose
 
     - name: "Add new vm ip addresses to rhv_hosts group"
       add_host:
-        name: "{{ item.instance.ipv4 }}"
+        name: "{{ item.ansible_facts.ovirt_vms|first|json_query('reported_devices[*].ips[*].address')|ipv4 }}"
         groups: rhv_hosts
-      with_items: "{{ rhv_created_vms.results }}"
+      with_items: "{{ wait_for_ip_output.results }}"
       when: wait_for_ip_address
 
   rescue:
