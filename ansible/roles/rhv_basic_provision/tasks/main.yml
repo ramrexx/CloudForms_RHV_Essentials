@@ -66,7 +66,7 @@
 
     - name: "Add new vm ip addresses to rhv_hosts group"
       add_host:
-        name: "{{ item.ansible_facts.ovirt_vms|first|json_query('reported_devices[*].ips[*].address')|ipv4 }}"
+        name: "{{ item.ansible_facts.ovirt_vms[0]|json_query('reported_devices[*].ips[*].address')|ipv4 }}"
         groups: rhv_hosts
       with_items: "{{ wait_for_ip_output.results }}"
       when: wait_for_ip_address
