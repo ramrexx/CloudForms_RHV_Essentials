@@ -59,7 +59,7 @@
 
     - name: Log wait_for_ip_output
       debug:
-      var: item.ansible_facts.ovirt_vms[0]|json_query('reported_devices[*].ips[*].address')|ipv4
+        msg: "{{ item.ansible_facts.ovirt_vms[0]|json_query('reported_devices[*].ips[*].address')|ipv4 }}"
       # var: item.ansible_facts.ovirt_vms[0]
       with_items: "{{ wait_for_ip_output.results }}"
       when: wait_for_ip_address and verbose
