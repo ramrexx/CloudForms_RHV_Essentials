@@ -24,7 +24,8 @@
         description: "{{ description | default(omit) }}"
         type: "{{ type | default('server') }}"
         disks: "{{ disks | default(omit) }}"
-        cloud_init: "{{ cloud_init | default(omit) }}"
+        cloud_init:
+          host_name: "{{ item }}"
         nics: "{{ networks | default(omit) }}"
       with_items: "{{ vm_names }}"
       register: rhv_created_vms_async
