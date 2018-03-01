@@ -29,7 +29,6 @@
           custom_script: |
             bootcmd:
             - "hostnamectl set-hostname {{ item }}.mbu.labs.redhat.com"
-          custom_script: |
             runcmd:
             - "touch /etc/cloud/cloud-init.disabled"
         nics: "{{ networks | default(omit) }}"
