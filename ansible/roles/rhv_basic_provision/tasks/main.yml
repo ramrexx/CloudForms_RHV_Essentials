@@ -28,8 +28,8 @@
           disable_root: false
           custom_script: |
             runcmd:
-              - "hostnamectl set-hostname {{ item }}.mbu.labs.redhat.com"
-              - "touch /etc/cloud/cloud-init.disabled"
+             - hostnamectl set-hostname "{{ item }}".mbu.labs.redhat.com
+             - touch /etc/cloud/cloud-init.disabled
         nics: "{{ networks | default(omit) }}"
       with_items: "{{ vm_names }}"
       register: rhv_created_vms_async
