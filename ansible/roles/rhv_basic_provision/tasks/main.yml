@@ -26,9 +26,11 @@
         disks: "{{ disks | default(omit) }}"
         cloud_init:
           disable_root: false
-          bootcmd:
+          custom_script: |
+            bootcmd:
             - "hostnamectl set-hostname {{ item }}.mbu.labs.redhat.com"
-          custom_script:
+          custom_script: |
+            runcmd:
             - "touch /etc/cloud/cloud-init.disabled"
         nics: "{{ networks | default(omit) }}"
       with_items: "{{ vm_names }}"
