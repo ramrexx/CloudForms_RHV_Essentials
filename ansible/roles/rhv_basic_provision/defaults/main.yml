@@ -46,7 +46,29 @@ nics:
 #   - name: "{{ disk_0_name | default('disk1') }}"
 #     bootable: "{{ disk_0_bootable | default(true) }}"
 
+dns_suffix: .mbu.labs.redhat.com
 
+custom_script: |
+  disable_root: false
+  users:
+    - name: root
+      lock_passwd: false
+      ssh_authorized_keys:
+        - "{{ ssh_authorized_key | default(omit) }}"
+  chpasswd:
+    list: |
+      root:!vault |
+                $ANSIBLE_VAULT;1.1;AES256
+                64346561363331306139653037363834323831623934353165356363393737396364616464343030
+                3833383338636666393534353936653234333561386433660a393437373730623264333938633833
+                38303830653665613035616263313936383935313566636530663363646566313432653731353334
+                3338643532373231610a323063626438323832346237343937313763626433653237633633316434
+                6435
+    expire: false
+  runcmd:
+    - "touch /etc/cloud/cloud-init.disabled"
+    - systemctl stop firewalld
+    - systemctl disable firewalld
 # asynchronous parameters
 async_wait: 3600
 async_poll: 0

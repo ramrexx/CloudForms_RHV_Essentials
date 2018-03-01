@@ -26,22 +26,8 @@
         disks: "{{ disks | default(omit) }}"
         nics: "{{ networks | default(omit) }}"
         cloud_init:
-          host_name: "{{ item }}.mbu.labs.redhat.com"
-          custom_script: |
-            disable_root: false
-            users:
-              - name: root
-                lock_passwd: false
-                ssh_authorized_keys:
-                  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC9ChhC7236nWFLTBbyACfrMg2/llXlepKs+vpVLssj4QoIbF80kS/tAsPggOvyrq925nyZDCV2/syX/NXLHsZMsU+GzBZBOvQWz+pWIV5ytgo4quIvQQvwT0kf02SQduBN/N5VFxZO2b05PhV1zJ1DSS32GNRMCiTKI/ou/r1t3T5/pk/INyem/rW5oSsyunvPdaj/khH/kKBS3BVPTk2G4eGlC/jxqYttZwhf9uQV+Xm+wYLXei051HM7xHsFmeL4x6NMlnfmviGfu17Uiu48sLlZn0g842iViXjeZf4/hRkkdNTEElVWl2pVCD9F3Iw0uLACC8bc6F/j1tiUr5hN Generated-by-Nova
-            chpasswd:
-              list: |
-                root:Redhat1!
-              expire: false
-            runcmd:
-              - "touch /etc/cloud/cloud-init.disabled"
-              - systemctl stop firewalld
-              - systemctl disable firewalld
+          host_name: "{{ item }}{{ dns_suffix | default(omit) }}"
+          custom_script: "{{ custom_script }}"
       with_items: "{{ vm_names }}"
       register: rhv_created_vms_async
       async: "{{ async_wait }}"
