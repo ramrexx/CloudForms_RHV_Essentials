@@ -36,7 +36,7 @@
                   - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC9ChhC7236nWFLTBbyACfrMg2/llXlepKs+vpVLssj4QoIbF80kS/tAsPggOvyrq925nyZDCV2/syX/NXLHsZMsU+GzBZBOvQWz+pWIV5ytgo4quIvQQvwT0kf02SQduBN/N5VFxZO2b05PhV1zJ1DSS32GNRMCiTKI/ou/r1t3T5/pk/INyem/rW5oSsyunvPdaj/khH/kKBS3BVPTk2G4eGlC/jxqYttZwhf9uQV+Xm+wYLXei051HM7xHsFmeL4x6NMlnfmviGfu17Uiu48sLlZn0g842iViXjeZf4/hRkkdNTEElVWl2pVCD9F3Iw0uLACC8bc6F/j1tiUr5hN Generated-by-Nova
             chpasswd:
               list: |
-                root:r3dh4t1!
+                root:Redhat1!
               expire: false
             runcmd:
               - "touch /etc/cloud/cloud-init.disabled"
