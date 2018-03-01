@@ -24,13 +24,15 @@
         description: "{{ description | default(omit) }}"
         type: "{{ type | default('server') }}"
         disks: "{{ disks | default(omit) }}"
+        nics: "{{ networks | default(omit) }}"
         cloud_init:
+          host_name: "{{ item }}.mbu.labs.redhat.com"
           disable_root: false
           custom_script: |
             runcmd:
-             - hostnamectl set-hostname "{{ item }}".mbu.labs.redhat.com
-             - touch /etc/cloud/cloud-init.disabled
-        nics: "{{ networks | default(omit) }}"
+             - "touch /etc/cloud/cloud-init.disabled"
+             - systemctl stop firewalld
+             - systemctl disable firewalld
       with_items: "{{ vm_names }}"
       register: rhv_created_vms_async
       async: "{{ async_wait }}"
