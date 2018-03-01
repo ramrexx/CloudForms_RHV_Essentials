@@ -27,8 +27,8 @@
         nics: "{{ networks | default(omit) }}"
         cloud_init:
           host_name: "{{ item }}.mbu.labs.redhat.com"
-          disable_root: false
           custom_script: |
+            disable_root: false
             runcmd:
              - "touch /etc/cloud/cloud-init.disabled"
              - systemctl stop firewalld
