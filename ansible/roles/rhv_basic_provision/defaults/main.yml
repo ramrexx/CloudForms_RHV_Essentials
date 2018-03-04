@@ -48,6 +48,7 @@ nics:
 
 dns_suffix: .mbu.labs.redhat.com
 
+# cloud_init script 
 custom_script: |
   disable_root: false
   users:
